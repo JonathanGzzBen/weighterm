@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 find_package(docopt COMPONENTS CXX REQUIRED)
 include_directories(${DOCOPT_INCLUDE_DIRS})
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 
 add_executable(weighterm src/weighterm.cpp)
-target_link_libraries(${PROJECT_NAME} docopt)
+target_link_libraries(${PROJECT_NAME} ${CONAN_LIBS})
