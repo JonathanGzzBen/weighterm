@@ -27,6 +27,7 @@ jobs:
     
     - name: Install dependencies using Conan
       run: |
+        pip install conan
         mkdir build
         cd build
         conan install .. --build=docopt.cpp --build=sqlite3
