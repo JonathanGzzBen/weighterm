@@ -5,7 +5,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 
 find_package(docopt COMPONENTS CXX REQUIRED)
-include_directories(${DOCOPT_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR})
+include_directories(${CMAKE_SOURCE_DIR})
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 
 set(SOURCES
         src/weighterm_data_sqlite.cpp
@@ -14,4 +15,4 @@ set(SOURCES
     )
 
 add_executable(weighterm ${SOURCES})
-target_link_libraries(${PROJECT_NAME} docopt sqlite3)
+target_link_libraries(${PROJECT_NAME} ${CONAN_LIBS})
