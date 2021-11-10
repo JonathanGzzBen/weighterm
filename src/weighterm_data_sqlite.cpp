@@ -55,6 +55,7 @@ WeightermDataSqlite::~WeightermDataSqlite() {
 DataResult WeightermDataSqlite::RegisterWeight(double weight) {
   char* errorMessage = NULL;
   std::stringstream insert_statement_sql{};
+  insert_statement_sql << "INSERT INTO weight(Kg) VALUES (" << weight << ");";
   std::cout << insert_statement_sql.str() << std::endl;
   int rc = sqlite3_exec(m_db, insert_statement_sql.str().c_str(), NULL, NULL,
                         &errorMessage);
