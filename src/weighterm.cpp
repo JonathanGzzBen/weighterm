@@ -1,3 +1,4 @@
+#include <docopt.h>
 #include <sqlite3.h>
 
 #include <exception>
@@ -5,10 +6,9 @@
 #include <memory>
 #include <string>
 
-#include "data_exception.h"
-#include "docopt.h"
-#include "weighterm_data.h"
-#include "weighterm_data_sqlite.h"
+#include "src/data_exception.h"
+#include "src/weighterm_data.h"
+#include "src/weighterm_data_sqlite.h"
 
 const char USAGE[] =
     R"(weighterm. Weight tracking terminal application
@@ -24,24 +24,23 @@ const char USAGE[] =
       --version     Show version.
 )";
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   std::map<std::string, docopt::value> args =
       docopt::docopt(USAGE, {argv + 1, argv + argc}, true, "weighterm 0.1");
-  for (auto const& arg : args) {
+  for (auto const &arg : args) {
     std::cout << arg.first << " " << arg.second << std::endl;
   }
   std::unique_ptr<WeightermData> data;
   try {
     data = std::make_unique<WeightermDataSqlite>();
-  } catch (DataException& e) {
+  } catch (DataException &e) {
     std::cout << e.what() << std::endl;
   }
   if (args.at("<weight>")) {
     double weight{0};
     try {
       weight = std::stod(args.at("<weight>").asString());
-
-    } catch (const std::exception& ex) {
+    } catch (const std::exception &ex) {
       std::cout << "Weight must be a numeric value." << std::endl;
       return -1;
     }

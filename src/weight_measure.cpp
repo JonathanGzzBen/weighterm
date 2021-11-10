@@ -1,4 +1,4 @@
-#include "weight_measure.h"
+#include "src/weight_measure.h"
 
 WeightMeasure::WeightMeasure(int id, double weight)
     : m_id(id), m_weight(weight) {}

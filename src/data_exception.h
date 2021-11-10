@@ -1,5 +1,5 @@
-#ifndef _DATA_EXCEPTION_H_
-#define _DATA_EXCEPTION_H_
+#ifndef SRC_DATA_EXCEPTION_H_
+#define SRC_DATA_EXCEPTION_H_
 #include <exception>
 #include <string>
 class DataException : public std::exception {
@@ -11,4 +11,4 @@ class DataException : public std::exception {
   ~DataException() = default;
   virtual const char* what() const noexcept { return m_message.c_str(); };
 };
-#endif
+#endif  // SRC_DATA_EXCEPTION_H_

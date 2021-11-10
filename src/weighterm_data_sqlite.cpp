@@ -1,4 +1,4 @@
-#include "weighterm_data_sqlite.h"
+#include "src/weighterm_data_sqlite.h"
 
 #include <sqlite3.h>
 
@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-#include "data_exception.h"
+#include "src/data_exception.h"
 
 DataResult WeightermDataSqlite::initializeDatabase() {
   auto result_code = sqlite3_open("weighterm.db", &m_db);

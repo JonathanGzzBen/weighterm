@@ -1,7 +1,8 @@
-#ifndef _WEIGHTERM_DATA_H
-#define _WEIGHTERM_DATA_H
+#ifndef SRC_WEIGHTERM_DATA_H_
+#define SRC_WEIGHTERM_DATA_H_
 #include <vector>
-#include "weight_measure.h"
+
+#include "src/weight_measure.h"
 enum class DataResult { CouldNotOpenDatabase, CouldNotRunQuery, Ok };
 class WeightermData {
  public:
@@ -11,4 +12,4 @@ class WeightermData {
   virtual const std::vector<WeightMeasure> ListWeights() const = 0;
 };
 
-#endif
+#endif  // SRC_WEIGHTERM_DATA_H_

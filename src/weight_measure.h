@@ -1,5 +1,5 @@
-#ifndef _WEIGHT_MEASURE_H_
-#define _WEIGHT_MEASURE_H_
+#ifndef SRC_WEIGHT_MEASURE_H_
+#define SRC_WEIGHT_MEASURE_H_
 class WeightMeasure {
  private:
   int m_id;
@@ -12,4 +12,4 @@ class WeightMeasure {
   double get_weight();
   void set_weight(double weight);
 };
-#endif
+#endif  //  SRC_WEIGHT_MEASURE_H_

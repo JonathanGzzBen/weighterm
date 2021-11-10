@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 
 find_package(docopt COMPONENTS CXX REQUIRED)
-include_directories(${DOCOPT_INCLUDE_DIRS} ./src)
+include_directories(${DOCOPT_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR})
 
 set(SOURCES
         src/weighterm_data_sqlite.cpp
