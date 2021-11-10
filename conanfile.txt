@@ -1,5 +1,6 @@
 [requires]
 docopt.cpp/0.6.3
+sqlite3/3.36.0
 
 [generators]
 cmake
