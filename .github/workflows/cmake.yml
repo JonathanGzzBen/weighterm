@@ -6,10 +6,6 @@ on:
   pull_request:
     branches: [ main ]
 
-env:
-  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
-  BUILD_TYPE: Release
-
 jobs:
   job:
     name: ${{ matrix.os}}-build
@@ -23,29 +19,22 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
-    - name: Install dependencies using Conan
+    - name: Install dependencies with vcpkg
       run: |
-        pip install conan
-        mkdir build
-        cd build
-        conan install .. --build=missing
+        git clone https://github.com/Microsoft/vcpkg.git
+        ./vcpkg/bootstrap-vcpkg.sh
+        ./vcpkg/vcpkg install
 
     - name: Configure CMake
-      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: cmake -B ${{github.workspace}}/build
+      run: cmake -B ${{github.workspace}}/build -S . -DCMAKE_TOOLCHAIN_FILE="$(pwd)/vcpkg/scripts/buildsystems/vcpkg.cmake"
 
     - name: Build
-      # Build your program with the given configuration
       run: cmake --build ${{github.workspace}}/build
       
     - name: Create Artifact
       run: |
         mkdir ${{matrix.os}}-release
-        echo "Files in build directory"
-        ls build
-        cp build/hololive-tetris* ${{matrix.os}}-release
-        cp images -r ${{matrix.os}}-release
+        cp build/weighterm ${{matrix.os}}-release
     - name: Publish Artifact
       uses: actions/upload-artifact@v2
       with:
