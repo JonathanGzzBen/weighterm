@@ -5,6 +5,10 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+    
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
 
 jobs:
   job:
@@ -15,9 +19,9 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            generator: "Unix Makefiles"
+            output-path: "build/weighterm"
           - os: windows-latest
-            generator: "MinGW Makefiles"
+            output-path: "build/Release"
     steps:
     - uses: actions/checkout@v2
     
@@ -29,15 +33,15 @@ jobs:
         VCPKG_FEATURE_FLAGS=manifests ./vcpkg/vcpkg install
 
     - name: Configure CMake
-      run: cmake -G "${{matrix.generator}}" -B ${{github.workspace}}/build -S . -DCMAKE_TOOLCHAIN_FILE="$(pwd)/vcpkg/scripts/buildsystems/vcpkg.cmake"
+      run: cmake -B ${{github.workspace}}/build -S . -DCMAKE_TOOLCHAIN_FILE="$(pwd)/vcpkg/scripts/buildsystems/vcpkg.cmake" -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
     - name: Build
-      run: cmake --build ${{github.workspace}}/build
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
       
     - name: Create Artifact
       run: |
         mkdir ${{matrix.os}}-release
-        cp build/weighterm ${{matrix.os}}-release
+        cp ${{output-path}} ${{matrix.os}}-release -r
     - name: Publish Artifact
       uses: actions/upload-artifact@v2
       with:
