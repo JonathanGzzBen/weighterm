@@ -4,10 +4,9 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup()
-
-find_package(docopt COMPONENTS CXX REQUIRED)
+# Using vcpkg
+find_package(unofficial-sqlite3 CONFIG REQUIRED)
+find_package(docopt CONFIG REQUIRED)
 
 include_directories(${DOCOPT_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR})
 
@@ -18,4 +17,5 @@ set(SOURCES
     )
 
 add_executable(weighterm ${SOURCES})
-target_link_libraries(${PROJECT_NAME} ${CONAN_LIBS})
+target_link_libraries(${PROJECT_NAME} PRIVATE docopt_s)
+target_link_libraries(${PROJECT_NAME} PRIVATE unofficial::sqlite3::sqlite3)
