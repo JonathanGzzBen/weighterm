@@ -15,7 +15,9 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
+            generator: "Unix Makefiles"
           - os: windows-latest
+            generator: "MinGW Makefiles"
     steps:
     - uses: actions/checkout@v2
     
@@ -27,7 +29,7 @@ jobs:
         VCPKG_FEATURE_FLAGS=manifests ./vcpkg/vcpkg install
 
     - name: Configure CMake
-      run: cmake -B ${{github.workspace}}/build -S . -DCMAKE_TOOLCHAIN_FILE="$(pwd)/vcpkg/scripts/buildsystems/vcpkg.cmake"
+      run: cmake -G "${{matrix.generator}}" -B ${{github.workspace}}/build -S . -DCMAKE_TOOLCHAIN_FILE="$(pwd)/vcpkg/scripts/buildsystems/vcpkg.cmake"
 
     - name: Build
       run: cmake --build ${{github.workspace}}/build
