@@ -17,5 +17,10 @@ set(SOURCES
     )
 
 add_executable(weighterm ${SOURCES})
-target_link_libraries(${PROJECT_NAME} PRIVATE docopt_s)
+IF (WIN32)
+    target_link_libraries(${PROJECT_NAME} PRIVATE docopt)
+ELSE()
+    target_link_libraries(${PROJECT_NAME} PRIVATE docopt_s)
+ENDIF()
+
 target_link_libraries(${PROJECT_NAME} PRIVATE unofficial::sqlite3::sqlite3)
