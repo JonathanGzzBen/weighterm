@@ -41,7 +41,7 @@ jobs:
     - name: Create Artifact
       run: |
         mkdir ${{matrix.os}}-release
-        cp ${{output-path}} ${{matrix.os}}-release -r
+        cp ${{matrix.output-path}} ${{matrix.os}}-release -r
     - name: Publish Artifact
       uses: actions/upload-artifact@v2
       with:
