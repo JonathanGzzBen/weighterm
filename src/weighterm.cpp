@@ -28,7 +28,7 @@ const char USAGE[] =
 int main(int argc, char **argv) {
   std::map<std::string, docopt::value> args =
       docopt::docopt(USAGE, {argv + 1, argv + argc}, true, "weighterm 0.1");
-  for (auto const &arg : args) {
+  for (const auto &arg : args) {
     std::cout << arg.first << " " << arg.second << std::endl;
   }
   std::unique_ptr<WeightermData> data;
@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
     }
   } else if (args.at("list")) {
     auto weight_measures{data->ListWeights()};
-    for (auto weight : weight_measures) {
+    for (const auto &weight : weight_measures) {
       std::cout << "ID: " << std::setw(4) << std::left << weight.get_id()
                 << "Weight: " << weight.get_weight() << std::endl;
     }
