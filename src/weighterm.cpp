@@ -8,6 +8,7 @@
 #include <string>
 
 #include "src/data_exception.h"
+#include "src/weighterm_cli.h"
 #include "src/weighterm_data.h"
 #include "src/weighterm_data_sqlite.h"
 
@@ -38,23 +39,9 @@ int main(int argc, char **argv) {
     std::cout << e.what() << std::endl;
   }
   if (args.at("<weight>")) {
-    double weight{0};
-    try {
-      weight = std::stod(args.at("<weight>").asString());
-    } catch (const std::exception &ex) {
-      std::cout << "Weight must be a numeric value." << std::endl;
-      return -1;
-    }
-    auto result{data->RegisterWeight(weight)};
-    if (result != DataResult::Ok) {
-      std::cout << "Could not register weight." << std::endl;
-    }
+    registerWeight(data.get(), args.at("<weight>").asString());
   } else if (args.at("list")) {
-    auto weight_measures{data->ListWeights()};
-    for (const auto &weight : weight_measures) {
-      std::cout << "ID: " << std::setw(4) << std::left << weight.get_id()
-                << "Weight: " << weight.get_weight() << std::endl;
-    }
+    listWeights(data.get());
   }
   return 0;
 }
