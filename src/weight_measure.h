@@ -8,8 +8,8 @@ class WeightMeasure {
  public:
   WeightMeasure() = default;
   WeightMeasure(int id, double weight);
-  int get_id();
-  double get_weight();
+  int get_id() const;
+  double get_weight() const;
   void set_weight(double weight);
 };
 #endif  //  SRC_WEIGHT_MEASURE_H_
