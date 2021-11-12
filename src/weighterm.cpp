@@ -2,6 +2,7 @@
 #include <sqlite3.h>
 
 #include <exception>
+#include <iomanip>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -49,9 +50,10 @@ int main(int argc, char **argv) {
       std::cout << "Could not register weight." << std::endl;
     }
   } else if (args.at("list")) {
-    auto weights{data->ListWeights()};
-    for (auto weight : weights) {
-      std::cout << "Weight: " << weight.get_weight() << std::endl;
+    auto weight_measures{data->ListWeights()};
+    for (auto weight : weight_measures) {
+      std::cout << "ID: " << std::setw(4) << std::left << weight.get_id()
+                << "Weight: " << weight.get_weight() << std::endl;
     }
   }
   return 0;
