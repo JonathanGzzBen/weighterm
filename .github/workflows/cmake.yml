@@ -20,8 +20,6 @@ jobs:
         include:
           - os: ubuntu-latest
             output-path: "build/weighterm"
-          - os: windows-latest
-            output-path: "build/Release"
     steps:
     - uses: actions/checkout@v2
     
