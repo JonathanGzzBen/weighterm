@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
 set(This weighterm)
-set(ThisTest weighterm-test)
 project(${This} VERSION 0.1)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -31,17 +30,17 @@ enable_testing()
 add_subdirectory(./libs/googletest)
 
 add_executable(${This} ${SOURCES})
-add_library(${ThisTest} STATIC ${SOURCES} ${HEADERS})
+add_library(${This}_lib STATIC ${SOURCES} ${HEADERS})
+
 IF (WIN32)
     target_link_libraries(${This} PRIVATE docopt)
-    target_link_libraries(${ThisTest} PRIVATE docopt)
+    target_link_libraries(${This}_lib PRIVATE docopt)
 ELSE()
     target_link_libraries(${This} PRIVATE docopt_s)
-    target_link_libraries(${ThisTest} PRIVATE docopt_s)
+    target_link_libraries(${This}_lib PRIVATE docopt_s)
 ENDIF()
 
 target_link_libraries(${This} PRIVATE unofficial::sqlite3::sqlite3)
-target_link_libraries(${ThisTest} PRIVATE unofficial::sqlite3::sqlite3)
-
+target_link_libraries(${This}_lib PRIVATE unofficial::sqlite3::sqlite3)
 
 add_subdirectory(test)

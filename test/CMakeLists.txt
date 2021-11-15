@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-set(This WeightermTests)
+set(This weighterm_tests)
 
 set(Sources
         ./weighterm_cli_test.cpp
@@ -10,7 +10,7 @@ add_executable(${This} ${Sources})
 target_link_libraries(${This} PUBLIC
     gtest_main
     gmock
-    weighterm-test
+    weighterm_lib
 )
 
 add_test(
