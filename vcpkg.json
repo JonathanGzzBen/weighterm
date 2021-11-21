@@ -1,8 +1,0 @@
-{
-    "name": "weighterm",
-    "version-string": "0.1",
-    "dependencies": [
-        "docopt",
-        "sqlite3"
-    ]
-}
