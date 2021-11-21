@@ -19,19 +19,19 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            output-path: "build/weighterm"
+            output-path: "build/weighterm/bin"
     steps:
     - uses: actions/checkout@v2
     
-    - name: Install dependencies with vcpkg
+    - name: Install dependencies with conan
       shell: bash
+      working-directory: build
       run: |
-        git clone https://github.com/Microsoft/vcpkg.git
-        ./vcpkg/bootstrap-vcpkg.sh
-        VCPKG_FEATURE_FLAGS=manifests ./vcpkg/vcpkg install
+        pip install conan
+        conan .. --build missing
 
     - name: Configure CMake
-      run: cmake -B ${{github.workspace}}/build -S . -DCMAKE_TOOLCHAIN_FILE="$(pwd)/vcpkg/scripts/buildsystems/vcpkg.cmake" -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+      run: cmake -B ${{github.workspace}}/build -S . -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
