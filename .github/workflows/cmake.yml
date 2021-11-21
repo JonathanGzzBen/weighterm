@@ -25,8 +25,9 @@ jobs:
     
     - name: Install dependencies with conan
       shell: bash
-      working-directory: build
       run: |
+        mkdir build
+        cd build
         pip install conan
         conan .. --build missing
 
