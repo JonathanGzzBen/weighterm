@@ -29,7 +29,7 @@ jobs:
         mkdir build
         cd build
         pip install conan
-        conan .. --build missing
+        conan install .. --build missing
 
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}/build -S . -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
