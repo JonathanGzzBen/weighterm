@@ -4,6 +4,6 @@
 
 #include "src/weighterm_data.h"
 
-bool registerWeight(WeightermData* data, std::string weightString);
-bool listWeights(WeightermData* data);
+bool RegisterWeight(WeightermData* data, const std::string& weight_string);
+bool ListWeights(const WeightermData* weighterm_data);
 #endif  // SRC_WEIGHTERM_CLI_H_

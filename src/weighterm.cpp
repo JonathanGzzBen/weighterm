@@ -1,16 +1,11 @@
-#include <sqlite3.h>
 
 #include <CLI/CLI.hpp>
-#include <exception>
 #include <iomanip>
-#include <iostream>
-#include <memory>
 #include <string>
 
 #include "spdlog/spdlog.h"
 #include "src/data_exception.h"
 #include "src/weighterm_cli.h"
-#include "src/weighterm_data.h"
 #include "src/weighterm_data_sqlite.h"
 
 int main(int argc, char **argv) {
@@ -30,10 +25,11 @@ int main(int argc, char **argv) {
     spdlog::error(e.what());
   }
   if (register_command) {
-    registerWeight(data.get(), std::to_string(weight));
+    const auto kWeightStr{std::to_string(weight)};
+    RegisterWeight(data.get(), kWeightStr);
   }
   if (list_command) {
-    listWeights(data.get());
+    ListWeights(data.get());
   }
   return 0;
 }

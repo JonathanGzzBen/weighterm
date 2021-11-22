@@ -2,14 +2,14 @@
 #define SRC_WEIGHT_MEASURE_H_
 class WeightMeasure {
  private:
-  int m_id;
-  double m_weight;
+  int id_;
+  double weight_;
 
  public:
   WeightMeasure() = default;
   WeightMeasure(int id, double weight);
-  int get_id() const;
-  double get_weight() const;
-  void set_weight(double weight);
+  int GetId() const;
+  double GetWeight() const;
+  void SetWeight(double weight);
 };
 #endif  //  SRC_WEIGHT_MEASURE_H_
