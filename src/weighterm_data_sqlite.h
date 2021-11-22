@@ -8,13 +8,13 @@
 #include "src/weighterm_data.h"
 class WeightermDataSqlite : public WeightermData {
  private:
-  DataResult initializeDatabase();
-  sqlite3* m_db;
+  DataResult InitializeDatabase();
+  sqlite3* db_ = nullptr;
 
  public:
   WeightermDataSqlite();
-  virtual ~WeightermDataSqlite();
-  virtual DataResult RegisterWeight(double weight);
-  virtual const std::vector<WeightMeasure> ListWeights() const;
+  ~WeightermDataSqlite() override;
+  DataResult RegisterWeight(double weight) override;
+  std::vector<WeightMeasure> ListWeights() const override;
 };
 #endif  // SRC_WEIGHTERM_DATA_SQLITE_H_

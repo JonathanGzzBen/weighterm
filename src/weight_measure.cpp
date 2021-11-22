@@ -1,10 +1,10 @@
 #include "src/weight_measure.h"
 
 WeightMeasure::WeightMeasure(int id, double weight)
-    : m_id(id), m_weight(weight) {}
+    : id_(id), weight_(weight) {}
 
-int WeightMeasure::get_id() const { return m_id; }
+int WeightMeasure::GetId() const { return id_; }
 
-double WeightMeasure::get_weight() const { return m_weight; }
+double WeightMeasure::GetWeight() const { return weight_; }
 
-void WeightMeasure::set_weight(double weight) { m_weight = weight; }
+void WeightMeasure::SetWeight(double weight) { weight_ = weight; }

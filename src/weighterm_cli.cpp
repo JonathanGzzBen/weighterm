@@ -3,27 +3,32 @@
 #include <iomanip>
 #include <iostream>
 
-bool registerWeight(WeightermData* data, std::string weightString) {
-  double weight{0};
+#include "spdlog/spdlog.h"
+
+bool RegisterWeight(WeightermData* data, const std::string& weight_string) {
+  double weight;
   try {
-    weight = std::stod(weightString);
-  } catch (const std::exception& ex) {
-    std::cerr << "Weight must be a numeric value." << std::endl;
+    weight = std::stod(weight_string);
+  } catch (const std::invalid_argument&) {
+    spdlog::error("Weight must be a numeric value");
+    return false;
+  } catch(const std::out_of_range&) {
+    spdlog::error("Weight out of range");
     return false;
   }
   auto result{data->RegisterWeight(weight)};
-  if (result != DataResult::Ok) {
-    std::cerr << "Could not register weight." << std::endl;
+  if (result != DataResult::OK) {
+    spdlog::error("Could not register weight");
     return false;
   }
   return true;
 }
 
-bool listWeights(WeightermData* data) {
-  auto weight_measures{data->ListWeights()};
+bool ListWeights(const WeightermData* const weighterm_data) {
+  auto weight_measures{weighterm_data->ListWeights()};
   for (const auto& weight : weight_measures) {
-    std::cout << "ID: " << std::setw(4) << std::left << weight.get_id()
-              << "Weight: " << weight.get_weight() << std::endl;
+    std::cout << "ID: " << std::setw(4) << std::left << weight.GetId()
+              << "Weight: " << weight.GetWeight() << std::endl;
   }
   return true;
 }
