@@ -1,4 +1,4 @@
-#include <docopt.h>
+#include <docopt/docopt.h>
 #include <sqlite3.h>
 
 #include <exception>
