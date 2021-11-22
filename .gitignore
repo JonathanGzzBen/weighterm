@@ -36,3 +36,6 @@ build/
 
 # cache
 .cache/
+
+# CLion
+cmake-build-debug
