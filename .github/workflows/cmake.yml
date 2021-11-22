@@ -9,7 +9,6 @@ on:
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
-  CONAN_USER_HOME: "~/conan"
 
 jobs:
   job:
@@ -27,19 +26,17 @@ jobs:
     - name: Install dependencies with conan
       shell: bash
       run: |
-        mkdir ${{ env.CONAN_USER_HOME }}
         mkdir build
         cd build
         pip install conan
-        CONAN_USER_HOME=${{ env.CONAN_USER_HOME }} conan install .. --build missing
+        conan install .. --build missing
 
     - name: Configure CMake
-      run: CONAN_USER_HOME=${{ env.CONAN_USER_HOME }} cmake -B ${{github.workspace}}/build -S . -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+      run: cmake -B ${{github.workspace}}/build -S . -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
     - name: Build
       run: |
-        sudo apt-get install libdocopt0 -y
-        CONAN_USER_HOME=${{ env.CONAN_USER_HOME }} cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+        cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
     - name: Test
       working-directory: ${{github.workspace}}/build
       run: ctest -C ${{env.BUILD_TYPE}} --output-on-failure
