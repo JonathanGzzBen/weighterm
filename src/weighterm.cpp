@@ -7,6 +7,7 @@
 #include <memory>
 #include <string>
 
+#include "spdlog/spdlog.h"
 #include "src/data_exception.h"
 #include "src/weighterm_cli.h"
 #include "src/weighterm_data.h"
@@ -26,7 +27,7 @@ int main(int argc, char **argv) {
   try {
     data = std::make_unique<WeightermDataSqlite>();
   } catch (const DataException &e) {
-    std::cout << e.what() << std::endl;
+    spdlog::error(e.what());
   }
   if (register_command) {
     registerWeight(data.get(), std::to_string(weight));
