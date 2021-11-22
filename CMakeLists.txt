@@ -7,11 +7,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 
 # Using conan
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup()
-include_directories(${DOCOPT_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR})
-
-find_package(docopt COMPONENTS CXX REQUIRED)
-find_package(SQLite3)
+conan_basic_setup(TARGETS)
+include_directories(${CMAKE_SOURCE_DIR} ./src)
 
 set(SOURCES
         src/weighterm_data_sqlite.cpp
@@ -34,7 +31,7 @@ add_subdirectory(./libs/googletest)
 add_executable(${This} ${SOURCES})
 add_library(${This}_lib STATIC ${SOURCES} ${HEADERS})
 
-target_link_libraries(${This} ${CONAN_LIBS})
-target_link_libraries(${This}_lib ${CONAN_LIBS})
+conan_target_link_libraries(${This})
+conan_target_link_libraries(${This}_lib)
 
 add_subdirectory(test)
