@@ -10,6 +10,7 @@ class WeightermData {
   virtual ~WeightermData() = default;
   virtual DataResult RegisterWeight(double weight) = 0;
   virtual std::vector<WeightMeasure> ListWeights() const = 0;
+  virtual DataResult DeleteWeight(int id) = 0;
 };
 
 #endif  // SRC_WEIGHTERM_DATA_H_

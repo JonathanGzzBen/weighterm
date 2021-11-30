@@ -35,6 +35,17 @@ bool ListWeights(const WeightermData* const weighterm_data) {
   }
   return true;
 }
+
+bool DeleteWeightMeasurement(WeightermData *weighterm_data, int id) {
+  spdlog::info("Deleting weight measure with ID: " + std::to_string(id));
+  auto const kResult{weighterm_data->DeleteWeight(id)};
+  if (kResult != DataResult::OK) {
+    spdlog::error("Could not delete weight measurement");
+    return false;
+  }
+  return true;
+}
+
 int HandleCli(int argc, char **argv){
   CLI::App cli_global{"weighterm 0.1"};
   auto &register_command = *cli_global.add_subcommand(
@@ -44,6 +55,11 @@ int HandleCli(int argc, char **argv){
       ->required();
   auto const &list_command =
       *cli_global.add_subcommand("list", "List registered weight measurements");
+
+  auto &delete_command = *cli_global.add_subcommand("delete", "Delete specific weight measurement");
+  int id;
+  delete_command.add_option("ID", id,"ID of weight measurement to delete")->required();
+
   CLI11_PARSE(cli_global, argc, argv)
   std::unique_ptr<WeightermData> data;
   try {
@@ -55,8 +71,10 @@ int HandleCli(int argc, char **argv){
     const auto kWeightStr{std::to_string(weight)};
     RegisterWeight(data.get(), kWeightStr);
   }
-  if (list_command) {
+  else if (list_command) {
     ListWeights(data.get());
+  } else if(delete_command) {
+    DeleteWeightMeasurement(data.get(), id);
   }
   return 0;
 }

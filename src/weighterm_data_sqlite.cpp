@@ -95,3 +95,36 @@ std::vector<WeightMeasure> WeightermDataSqlite::ListWeights() const {
   }
   return results;
 }
+DataResult WeightermDataSqlite::DeleteWeight(int id) {
+  char* error_message = nullptr;
+  std::stringstream count_statement_sql{};
+  count_statement_sql << "SELECT COUNT(*) FROM weight WHERE ID=" << id << ";";
+  int rows_found{0};
+  auto rc = sqlite3_exec(
+      db_, count_statement_sql.str().c_str(),
+      [](void* rows_found, int argc, char** argv, char**) {
+        if (argc == 1 && argv) {
+          *static_cast<int*>(rows_found) = std::stoi(argv[0]);
+        }
+        return 0;
+      },
+      &rows_found, &error_message);
+
+  if (rc != SQLITE_OK || rows_found <= 0) {
+    sqlite3_free(error_message);
+    return DataResult::COULD_NOT_RUN_QUERY;
+  }
+
+  std::stringstream insert_statement_sql{};
+  insert_statement_sql << "DELETE FROM weight WHERE ID=" << id << ";";
+  spdlog::info(insert_statement_sql.str());
+  rc = sqlite3_exec(
+      db_, insert_statement_sql.str().c_str(),
+      [](void* const, int, char**, char**) { return 0; }, nullptr,
+      &error_message);
+  if (rc != SQLITE_OK) {
+    sqlite3_free(error_message);
+    return DataResult::COULD_NOT_RUN_QUERY;
+  }
+  return DataResult::OK;
+}
