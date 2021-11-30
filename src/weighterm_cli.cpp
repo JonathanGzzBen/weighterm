@@ -100,6 +100,9 @@ int HandleCli(int argc, char **argv) {
     DeleteWeightMeasurement(data.get(), id);
   } else if (modify_command) {
     ModifyWeightMeasurement(data.get(), id, weight);
+  } else {
+    std::cout << "Run with --help or -h to see available subcommands."
+              << std::endl;
   }
   return 0;
 }
