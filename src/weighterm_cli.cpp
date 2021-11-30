@@ -8,14 +8,14 @@
 #include "spdlog/spdlog.h"
 #include "weighterm_data_sqlite.h"
 
-bool RegisterWeight(WeightermData* data, const std::string& weight_string) {
+bool RegisterWeight(WeightermData *data, const std::string &weight_string) {
   double weight;
   try {
     weight = std::stod(weight_string);
-  } catch (const std::invalid_argument&) {
+  } catch (const std::invalid_argument &) {
     spdlog::error("Weight must be a numeric value");
     return false;
-  } catch(const std::out_of_range&) {
+  } catch (const std::out_of_range &) {
     spdlog::error("Weight out of range");
     return false;
   }
@@ -27,9 +27,9 @@ bool RegisterWeight(WeightermData* data, const std::string& weight_string) {
   return true;
 }
 
-bool ListWeights(const WeightermData* const weighterm_data) {
+bool ListWeights(const WeightermData *const weighterm_data) {
   auto weight_measures{weighterm_data->ListWeights()};
-  for (const auto& weight : weight_measures) {
+  for (const auto &weight : weight_measures) {
     std::cout << "ID: " << std::setw(4) << std::left << weight.GetId()
               << "Weight: " << weight.GetWeight() << std::endl;
   }
@@ -46,7 +46,24 @@ bool DeleteWeightMeasurement(WeightermData *weighterm_data, int id) {
   return true;
 }
 
-int HandleCli(int argc, char **argv){
+bool ModifyWeightMeasurement(WeightermData *weighterm_data, int id,
+                             double weight) {
+  spdlog::info("Updating weight measure with ID: " + std::to_string(id));
+  auto const kResult{weighterm_data->ModifyWeight(id, weight)};
+  switch (kResult) {
+    case DataResult::OK:
+      spdlog::info("Weight measurement updated");
+      return true;
+    case DataResult::NOT_FOUND:
+      spdlog::error("There is no weight measurement with that ID");
+      break;
+    default:
+      spdlog::error("Could not update weight measurement");
+  }
+  return false;
+}
+
+int HandleCli(int argc, char **argv) {
   CLI::App cli_global{"weighterm 0.1"};
   auto &register_command = *cli_global.add_subcommand(
       "register", "Register a new weight measurement");
@@ -56,9 +73,16 @@ int HandleCli(int argc, char **argv){
   auto const &list_command =
       *cli_global.add_subcommand("list", "List registered weight measurements");
 
-  auto &delete_command = *cli_global.add_subcommand("delete", "Delete specific weight measurement");
+  auto &delete_command = *cli_global.add_subcommand(
+      "delete", "Delete specific weight measurement");
   int id;
-  delete_command.add_option("ID", id,"ID of weight measurement to delete")->required();
+  delete_command.add_option("ID", id, "ID of weight measurement to delete")
+      ->required();
+  auto &modify_command = *cli_global.add_subcommand(
+      "modify", "Modify specific weight measurement");
+  modify_command.add_option("ID", id, "ID of weight measurement to modify")
+      ->required();
+  modify_command.add_option("weight", weight, "New weight")->required();
 
   CLI11_PARSE(cli_global, argc, argv)
   std::unique_ptr<WeightermData> data;
@@ -70,11 +94,12 @@ int HandleCli(int argc, char **argv){
   if (register_command) {
     const auto kWeightStr{std::to_string(weight)};
     RegisterWeight(data.get(), kWeightStr);
-  }
-  else if (list_command) {
+  } else if (list_command) {
     ListWeights(data.get());
-  } else if(delete_command) {
+  } else if (delete_command) {
     DeleteWeightMeasurement(data.get(), id);
+  } else if (modify_command) {
+    ModifyWeightMeasurement(data.get(), id, weight);
   }
   return 0;
 }

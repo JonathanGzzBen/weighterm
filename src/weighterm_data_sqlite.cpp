@@ -112,7 +112,7 @@ DataResult WeightermDataSqlite::DeleteWeight(int id) {
 
   if (rc != SQLITE_OK || rows_found <= 0) {
     sqlite3_free(error_message);
-    return DataResult::COULD_NOT_RUN_QUERY;
+    return DataResult::NOT_FOUND;
   }
 
   std::stringstream insert_statement_sql{};
@@ -122,6 +122,38 @@ DataResult WeightermDataSqlite::DeleteWeight(int id) {
       db_, insert_statement_sql.str().c_str(),
       [](void* const, int, char**, char**) { return 0; }, nullptr,
       &error_message);
+  if (rc != SQLITE_OK) {
+    sqlite3_free(error_message);
+    return DataResult::COULD_NOT_RUN_QUERY;
+  }
+  return DataResult::OK;
+}
+DataResult WeightermDataSqlite::ModifyWeight(int id, double weight) {
+  char* error_message = nullptr;
+  std::string count_statement_sql{
+      "SELECT COUNT(*) FROM weight WHERE ID=" + std::to_string(id) + ";"};
+  int rows_found{0};
+  auto rc = sqlite3_exec(
+      db_, count_statement_sql.c_str(),
+      [](void* rows_found, int argc, char** argv, char**) {
+        if (argc == 1 && argv) {
+          *static_cast<int*>(rows_found) = std::stoi(argv[0]);
+        }
+        return 0;
+      },
+      &rows_found, &error_message);
+
+  if (rc != SQLITE_OK || rows_found <= 0) {
+    sqlite3_free(error_message);
+    return DataResult::NOT_FOUND;
+  }
+
+  std::string update_statement_sql{
+      "UPDATE weight SET kg=" + std::to_string(weight) +
+      " WHERE ID=" + std::to_string(id) + ";"};
+  spdlog::info(update_statement_sql);
+  rc = sqlite3_exec(db_, update_statement_sql.c_str(), nullptr, nullptr,
+                    &error_message);
   if (rc != SQLITE_OK) {
     sqlite3_free(error_message);
     return DataResult::COULD_NOT_RUN_QUERY;

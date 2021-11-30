@@ -7,5 +7,7 @@
 bool RegisterWeight(WeightermData* data, const std::string& weight_string);
 bool ListWeights(const WeightermData* weighterm_data);
 bool DeleteWeightMeasurement(WeightermData* weighterm_data, int id);
-int HandleCli(int argc, char **argv);
+bool ModifyWeightMeasurement(WeightermData* weighterm_data, int id,
+                             double weight);
+int HandleCli(int argc, char** argv);
 #endif  // SRC_WEIGHTERM_CLI_H_
