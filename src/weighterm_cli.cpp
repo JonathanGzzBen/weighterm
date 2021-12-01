@@ -69,7 +69,8 @@ int HandleCli(int argc, char **argv) {
       "register", "Register a new weight measurement");
   double weight;
   register_command.add_option("weight", weight, "Weight to register")
-      ->required();
+      ->required()
+      ->check(CLI::PositiveNumber);
   auto const &list_command =
       *cli_global.add_subcommand("list", "List registered weight measurements");
 
@@ -77,12 +78,16 @@ int HandleCli(int argc, char **argv) {
       "delete", "Delete specific weight measurement");
   int id;
   delete_command.add_option("ID", id, "ID of weight measurement to delete")
-      ->required();
+      ->required()
+      ->check(CLI::PositiveNumber);
   auto &modify_command = *cli_global.add_subcommand(
       "modify", "Modify specific weight measurement");
   modify_command.add_option("ID", id, "ID of weight measurement to modify")
-      ->required();
-  modify_command.add_option("weight", weight, "New weight")->required();
+      ->required()
+      ->check(CLI::PositiveNumber);
+  modify_command.add_option("weight", weight, "New weight")
+      ->required()
+      ->check(CLI::PositiveNumber);
 
   CLI11_PARSE(cli_global, argc, argv)
   std::unique_ptr<WeightermData> data;
@@ -100,6 +105,9 @@ int HandleCli(int argc, char **argv) {
     DeleteWeightMeasurement(data.get(), id);
   } else if (modify_command) {
     ModifyWeightMeasurement(data.get(), id, weight);
+  } else {
+    std::cout << "Run with --help or -h to see available subcommands."
+              << std::endl;
   }
   return 0;
 }
