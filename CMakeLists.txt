@@ -15,7 +15,7 @@ set(SOURCES
         src/weight_measure.cpp
         src/weighterm.cpp
         src/weighterm_cli.cpp
-    )
+        src/datetime.cpp)
 
 set(HEADERS
         src/data_exception.h
@@ -23,7 +23,7 @@ set(HEADERS
         src/weighterm_data.h
         src/weighterm_data_sqlite.h
         src/weighterm_cli.h
-    )
+        src/datetime.h)
 
 enable_testing()
 add_subdirectory(./libs/googletest)

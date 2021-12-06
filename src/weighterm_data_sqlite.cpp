@@ -60,12 +60,10 @@ DataResult WeightermDataSqlite::RegisterWeight(double weight) {
   char* error_message = nullptr;
   auto time_t_now =
       std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-  std::stringstream current_time_string{};
-  current_time_string << std::put_time(std::localtime(&time_t_now),
-                                       "%Y-%m-%d %H:%M:%S");
+  Datetime datetime{time_t_now};
   std::stringstream insert_statement_sql{};
   insert_statement_sql << "INSERT INTO weight(Kg, Datetime) VALUES (" << weight
-                       << ",\"" << current_time_string.str() << "\");";
+                       << ",\"" << datetime.toString() << "\");";
   spdlog::info(insert_statement_sql.str());
   int rc = sqlite3_exec(db_, insert_statement_sql.str().c_str(), nullptr,
                         nullptr, &error_message);
@@ -91,14 +89,11 @@ std::vector<WeightMeasure> WeightermDataSqlite::ListWeights() const {
         for (int i{0}; i < argc; i++) {
           values[az_col_name[i]] = argv[i];
         }
-        std::stringstream date_stream{values.at("Datetime")};
-        struct std::tm datetime_tm {};
-        date_stream >> std::get_time(&datetime_tm, "%Y-%m-%d %H:%M:%S");
-        time_t datetime = mktime(&datetime_tm);
         auto results_ptr = static_cast<std::vector<WeightMeasure>*>(
             weight_measures_vector_ptr);
         results_ptr->emplace_back(std::stoi(values.at("ID")),
-                                  std::stof(values.at("Kg")), datetime);
+                                  std::stof(values.at("Kg")),
+                                  Datetime{values.at("Datetime")});
         return 0;
       },
       &results, &error_message);
