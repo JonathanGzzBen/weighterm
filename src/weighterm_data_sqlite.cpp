@@ -2,8 +2,9 @@
 
 #include <sqlite3.h>
 
+#include <chrono>
+#include <iomanip>
 #include <map>
-#include <sstream>
 #include <string>
 #include <vector>
 
@@ -24,7 +25,8 @@ DataResult WeightermDataSqlite::InitializeDatabase() {
     sqlite3_exec(db_, R"(
 CREATE TABLE weight(
     ID INTEGER PRIMARY KEY AUTOINCREMENT,
-    Kg REAL NOT NULL
+    Kg REAL NOT NULL,
+    Datetime TEXT
 );
     )",
                  nullptr, nullptr, &error_message);
@@ -56,8 +58,14 @@ WeightermDataSqlite::~WeightermDataSqlite() {
 
 DataResult WeightermDataSqlite::RegisterWeight(double weight) {
   char* error_message = nullptr;
+  auto time_t_now =
+      std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+  std::stringstream current_time_string{};
+  current_time_string << std::put_time(std::localtime(&time_t_now),
+                                       "%Y-%m-%d %H:%M:%S");
   std::stringstream insert_statement_sql{};
-  insert_statement_sql << "INSERT INTO weight(Kg) VALUES (" << weight << ");";
+  insert_statement_sql << "INSERT INTO weight(Kg, Datetime) VALUES (" << weight
+                       << ",\"" << current_time_string.str() << "\");";
   spdlog::info(insert_statement_sql.str());
   int rc = sqlite3_exec(db_, insert_statement_sql.str().c_str(), nullptr,
                         nullptr, &error_message);
@@ -74,7 +82,7 @@ std::vector<WeightMeasure> WeightermDataSqlite::ListWeights() const {
   char* error_message = nullptr;
   int rc = sqlite3_exec(
       db_, R"(
-      SELECT ID, kg FROM weight;
+      SELECT ID, Kg, Datetime FROM weight;
 );
     )",
       [](void* weight_measures_vector_ptr, int argc, char** argv,
@@ -83,10 +91,14 @@ std::vector<WeightMeasure> WeightermDataSqlite::ListWeights() const {
         for (int i{0}; i < argc; i++) {
           values[az_col_name[i]] = argv[i];
         }
+        std::stringstream date_stream{values.at("Datetime")};
+        struct std::tm datetime_tm {};
+        date_stream >> std::get_time(&datetime_tm, "%Y-%m-%d %H:%M:%S");
+        time_t datetime = mktime(&datetime_tm);
         auto results_ptr = static_cast<std::vector<WeightMeasure>*>(
             weight_measures_vector_ptr);
         results_ptr->emplace_back(std::stoi(values.at("ID")),
-                                  std::stof(values.at("Kg")));
+                                  std::stof(values.at("Kg")), datetime);
         return 0;
       },
       &results, &error_message);

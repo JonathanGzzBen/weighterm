@@ -30,8 +30,12 @@ bool RegisterWeight(WeightermData *data, const std::string &weight_string) {
 bool ListWeights(const WeightermData *const weighterm_data) {
   auto weight_measures{weighterm_data->ListWeights()};
   for (const auto &weight : weight_measures) {
+    auto datetime = weight.GetDatetime();
+    std::stringstream time_stream{};
+    time_stream << std::put_time(std::localtime(&datetime), "%F %T");
     std::cout << "ID: " << std::setw(4) << std::left << weight.GetId()
-              << "Weight: " << weight.GetWeight() << std::endl;
+              << "Weight: " << std::setw(5) << weight.GetWeight()
+              << "Datetime: " << time_stream.str() << std::endl;
   }
   return true;
 }
