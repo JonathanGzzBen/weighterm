@@ -1,7 +1,9 @@
-#ifndef SRC_WEIGHT_MEASURE_H_
-#define SRC_WEIGHT_MEASURE_H_
+#ifndef WEIGHTERM_SRC_WEIGHT_MEASURE_H_
+#define WEIGHTERM_SRC_WEIGHT_MEASURE_H_
 #include <chrono>
+
 #include "src/datetime.h"
+
 class WeightMeasure {
  private:
   int id_;
@@ -9,12 +11,10 @@ class WeightMeasure {
   Datetime datetime_;
 
  public:
-  WeightMeasure() = default;
-  WeightMeasure(int id, double weight);
   WeightMeasure(int id, double weight, Datetime datetime);
   int GetId() const;
   double GetWeight() const;
   Datetime GetDatetime() const;
   void SetWeight(double weight);
 };
-#endif  //  SRC_WEIGHT_MEASURE_H_
+#endif  //  WEIGHTERM_SRC_WEIGHT_MEASURE_H_

@@ -11,11 +11,11 @@ conan_basic_setup(TARGETS)
 include_directories(${CMAKE_SOURCE_DIR} ./src)
 
 set(SOURCES
-        src/weighterm_data_sqlite.cpp
-        src/weight_measure.cpp
-        src/weighterm.cpp
-        src/weighterm_cli.cpp
-        src/datetime.cpp)
+        src/weighterm_data_sqlite.cc
+        src/weight_measure.cc
+        src/weighterm.cc
+        src/weighterm_cli.cc
+        src/datetime.cc)
 
 set(HEADERS
         src/data_exception.h

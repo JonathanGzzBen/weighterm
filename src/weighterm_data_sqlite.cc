@@ -10,6 +10,7 @@
 
 #include "spdlog/spdlog.h"
 #include "src/data_exception.h"
+
 DataResult WeightermDataSqlite::InitializeDatabase() {
   auto result_code = sqlite3_open("weighterm.db", &db_);
   if (result_code != SQLITE_OK) {

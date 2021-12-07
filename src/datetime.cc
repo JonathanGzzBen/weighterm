@@ -5,7 +5,7 @@
 
 Datetime::Datetime(time_t datetime_t) : datetime_t_(datetime_t) {}
 
-Datetime::Datetime(std::string date_string) {
+Datetime::Datetime(const std::string& date_string) {
   std::stringstream date_stream{date_string};
   struct std::tm datetime_tm {};
   date_stream >> std::get_time(&datetime_tm, "%Y-%m-%d %H:%M:%S");
