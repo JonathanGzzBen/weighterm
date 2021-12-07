@@ -31,7 +31,8 @@ bool ListWeights(const WeightermData *const weighterm_data) {
   auto weight_measures{weighterm_data->ListWeights()};
   for (const auto &weight : weight_measures) {
     std::cout << "ID: " << std::setw(4) << std::left << weight.GetId()
-              << "Weight: " << weight.GetWeight() << std::endl;
+              << "Weight: " << std::setw(5) << weight.GetWeight()
+              << "Datetime: " << weight.GetDatetime().toString() << std::endl;
   }
   return true;
 }
