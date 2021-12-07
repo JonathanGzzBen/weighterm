@@ -19,8 +19,7 @@ bool RegisterWeight(WeightermData *data, const std::string &weight_string) {
     spdlog::error("Weight out of range");
     return false;
   }
-  auto result{data->RegisterWeight(weight)};
-  if (result != DataResult::OK) {
+  if (data->RegisterWeight(weight) != DataResult::OK) {
     spdlog::error("Could not register weight");
     return false;
   }
@@ -28,19 +27,15 @@ bool RegisterWeight(WeightermData *data, const std::string &weight_string) {
 }
 
 bool ListWeights(const WeightermData *const weighterm_data) {
-  auto weight_measures{weighterm_data->ListWeights()};
-  for (const auto &weight : weight_measures) {
-    std::cout << "ID: " << std::setw(4) << std::left << weight.GetId()
-              << "Weight: " << std::setw(5) << weight.GetWeight()
-              << "Datetime: " << weight.GetDatetime().toString() << std::endl;
+  for (const auto &weight : weighterm_data->ListWeights()) {
+    spdlog::info("{}", weight);
   }
   return true;
 }
 
 bool DeleteWeightMeasurement(WeightermData *weighterm_data, int id) {
   spdlog::info("Deleting weight measure with ID: " + std::to_string(id));
-  auto const kResult{weighterm_data->DeleteWeight(id)};
-  if (kResult != DataResult::OK) {
+  if (weighterm_data->DeleteWeight(id) != DataResult::OK) {
     spdlog::error("Could not delete weight measurement");
     return false;
   }
@@ -50,8 +45,7 @@ bool DeleteWeightMeasurement(WeightermData *weighterm_data, int id) {
 bool ModifyWeightMeasurement(WeightermData *weighterm_data, int id,
                              double weight) {
   spdlog::info("Updating weight measure with ID: " + std::to_string(id));
-  auto const kResult{weighterm_data->ModifyWeight(id, weight)};
-  switch (kResult) {
+  switch (weighterm_data->ModifyWeight(id, weight)) {
     case DataResult::OK:
       spdlog::info("Weight measurement updated");
       return true;
@@ -98,8 +92,7 @@ int HandleCli(int argc, char **argv) {
     spdlog::error(e.what());
   }
   if (register_command) {
-    const auto kWeightStr{std::to_string(weight)};
-    RegisterWeight(data.get(), kWeightStr);
+    RegisterWeight(data.get(), std::to_string(weight));
   } else if (list_command) {
     ListWeights(data.get());
   } else if (delete_command) {
@@ -107,8 +100,7 @@ int HandleCli(int argc, char **argv) {
   } else if (modify_command) {
     ModifyWeightMeasurement(data.get(), id, weight);
   } else {
-    std::cout << "Run with --help or -h to see available subcommands."
-              << std::endl;
+    spdlog::info("Run with --help or -h to see available subcommands.");
   }
   return 0;
 }

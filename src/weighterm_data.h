@@ -16,7 +16,7 @@ class WeightermData {
   WeightermData() = default;
   virtual ~WeightermData() = default;
   virtual DataResult RegisterWeight(double weight) = 0;
-  virtual std::vector<WeightMeasure> ListWeights() const = 0;
+  [[nodiscard]] virtual std::vector<WeightMeasure> ListWeights() const = 0;
   virtual DataResult DeleteWeight(int id) = 0;
   virtual DataResult ModifyWeight(int id, double weight) = 0;
 };

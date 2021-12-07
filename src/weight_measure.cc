@@ -7,6 +7,11 @@ int WeightMeasure::GetId() const { return id_; }
 
 double WeightMeasure::GetWeight() const { return weight_; }
 
-Datetime WeightMeasure::GetDatetime() const { return datetime_; };
+Datetime WeightMeasure::GetDatetime() const { return datetime_; }
 
-void WeightMeasure::SetWeight(double weight) { weight_ = weight; }
+template <typename OStream>
+OStream& operator<<(OStream& os, const WeightMeasure& weight_measure) {
+  return os << "[WeightMeasure ID=" << weight_measure.GetId()
+            << " Kg=" << weight_measure.GetWeight()
+            << " Datetime=" << weight_measure.GetDatetime().ToString() << "]";
+}

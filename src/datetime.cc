@@ -12,7 +12,7 @@ Datetime::Datetime(const std::string& date_string) {
   datetime_t_ = mktime(&datetime_tm);
 }
 
-std::string Datetime::toString() {
+std::string Datetime::ToString() const {
   std::stringstream datetime_string_stream{};
   datetime_string_stream << std::put_time(std::localtime(&datetime_t_),
                                           "%Y-%m-%d %H:%M:%S");
