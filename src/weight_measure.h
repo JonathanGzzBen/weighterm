@@ -14,7 +14,11 @@ class WeightMeasure {
   [[nodiscard]] Datetime GetDatetime() const;
 
   template <typename OStream>
-  friend OStream &operator<<(OStream &os, const WeightMeasure &weight_measure);
+  friend OStream &operator<<(OStream &os, const WeightMeasure &weight_measure) {
+    return os << "[WeightMeasure ID=" << weight_measure.GetId()
+              << " Kg=" << weight_measure.GetWeight() << " Datetime=\""
+              << weight_measure.GetDatetime().ToString() << "\"]";
+  }
 
  private:
   int id_;
