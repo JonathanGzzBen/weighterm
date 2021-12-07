@@ -18,20 +18,18 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            output-path: "build/weighterm/bin"
+            output-path: "build/bin"
           - os: windows-latest
-            output-path: "build/weighterm/bin"
+            output-path: "build/bin"
     steps:
       - uses: actions/checkout@v2
 
       - name: Install dependencies with conan
         shell: bash
         run: |
+          ./scripts/install-conan-${{ matrix.os }}.sh
           mkdir build
           cd build
-          pip install conan
-          conan profile new default --detect
-          conan profile update settings.compiler.libcxx=libstdc++11 default
           conan install .. --build missing
 
       - name: Configure CMake
