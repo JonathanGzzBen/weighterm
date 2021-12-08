@@ -1,0 +1,54 @@
+name: CMake
+
+on:
+  push:
+    branches: [ main, github-actions ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  job:
+    name: ${{ matrix.os}}-build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            output-path: "build/bin"
+          - os: windows-latest
+            output-path: "build/bin"
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install dependencies with conan
+        shell: bash
+        run: |
+          ./scripts/install-conan-${{ matrix.os }}.sh
+          mkdir build
+          cd build
+          conan install .. --build missing -s build_type=${{env.BUILD_TYPE}}
+
+      - name: Configure CMake
+        run: cmake -B ${{github.workspace}}/build -S . -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+      - name: Build
+        run: |
+          cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+      - name: Test
+        working-directory: ${{github.workspace}}/build
+        run: ctest -C ${{env.BUILD_TYPE}} --output-on-failure
+
+      - name: Create Artifact
+        run: |
+          mkdir ${{matrix.os}}-release
+          cp ${{matrix.output-path}} ${{matrix.os}}-release -r
+      - name: Publish Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{matrix.os}}-release
+          path: ${{matrix.os}}-release

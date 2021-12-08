@@ -25,8 +25,6 @@ set(HEADERS
         src/weighterm_cli.h
         src/datetime.h)
 
-enable_testing()
-add_subdirectory(./libs/googletest)
 
 add_executable(${This} ${SOURCES})
 add_library(${This}_lib STATIC ${SOURCES} ${HEADERS})
@@ -34,4 +32,5 @@ add_library(${This}_lib STATIC ${SOURCES} ${HEADERS})
 conan_target_link_libraries(${This})
 conan_target_link_libraries(${This}_lib)
 
+enable_testing()
 add_subdirectory(test)
