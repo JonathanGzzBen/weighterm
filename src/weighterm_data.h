@@ -18,7 +18,7 @@ class WeightermData {
   virtual DataResult RegisterWeight(double weight) = 0;
   [[nodiscard]] virtual std::vector<WeightMeasure> ListWeights() const = 0;
   virtual DataResult DeleteWeight(int id) = 0;
-  virtual DataResult ModifyWeight(int id, double weight) = 0;
+  virtual DataResult ModifyWeight(int id, double weight, Datetime datetime) = 0;
 };
 
 #endif  // WEIGHTERM_SRC_WEIGHTERM_DATA_H_

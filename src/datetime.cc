@@ -3,6 +3,11 @@
 #include <chrono>
 #include <iomanip>
 
+Datetime::Datetime() {
+  auto datetime_time_point{std::chrono::system_clock::now()};
+  datetime_t_ = std::chrono::system_clock::to_time_t(datetime_time_point);
+}
+
 Datetime::Datetime(time_t datetime_t) : datetime_t_(datetime_t) {}
 
 Datetime::Datetime(const std::string& date_string) {

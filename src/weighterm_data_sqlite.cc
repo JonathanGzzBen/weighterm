@@ -136,7 +136,9 @@ DataResult WeightermDataSqlite::DeleteWeight(int id) {
   }
   return DataResult::OK;
 }
-DataResult WeightermDataSqlite::ModifyWeight(int id, double weight) {
+
+DataResult WeightermDataSqlite::ModifyWeight(int id, double weight,
+                                             Datetime datetime) {
   char* error_message = nullptr;
   std::string count_statement_sql{
       "SELECT COUNT(*) FROM weight WHERE ID=" + std::to_string(id) + ";"};
@@ -157,8 +159,8 @@ DataResult WeightermDataSqlite::ModifyWeight(int id, double weight) {
   }
 
   std::string update_statement_sql{
-      "UPDATE weight SET kg=" + std::to_string(weight) +
-      " WHERE ID=" + std::to_string(id) + ";"};
+      "UPDATE weight SET Kg=" + std::to_string(weight) + ", Datetime=(\"" +
+      datetime.ToString() + "\") WHERE ID=" + std::to_string(id) + ";"};
   spdlog::info(update_statement_sql);
   rc = sqlite3_exec(db_, update_statement_sql.c_str(), nullptr, nullptr,
                     &error_message);

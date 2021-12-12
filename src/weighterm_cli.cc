@@ -43,9 +43,9 @@ bool DeleteWeightMeasurement(WeightermData *weighterm_data, int id) {
 }
 
 bool ModifyWeightMeasurement(WeightermData *weighterm_data, int id,
-                             double weight) {
+                             double weight, Datetime datetime) {
   spdlog::info("Updating weight measure with ID: " + std::to_string(id));
-  switch (weighterm_data->ModifyWeight(id, weight)) {
+  switch (weighterm_data->ModifyWeight(id, weight, datetime)) {
     case DataResult::OK:
       spdlog::info("Weight measurement updated");
       return true;
@@ -84,8 +84,29 @@ int HandleCli(int argc, char **argv) {
       ->required()
       ->check(CLI::PositiveNumber);
 
-  CLI11_PARSE(cli_global, argc, argv)
-  std::unique_ptr<WeightermData> data;
+  auto transform_datetime = CLI::Validator(
+      [](std::string &input) {
+        auto datetime_time_point{std::chrono::system_clock::now()};
+        if (input == "yesterday") {
+          datetime_time_point -= std::chrono::days(1);
+        } else if (input != "now") {
+          return std::string{
+              "Specify a valid datetime (\"now\", \"yesterday\", \"2021-12-31 "
+              "12:00:00\")"};
+        }
+        input =
+            Datetime{std::chrono::system_clock::to_time_t(datetime_time_point)}
+                .ToString();
+        return std::string();
+      },
+      "DATETIME", "Datetime transformer");
+
+  std::string datetime_str{Datetime{}.ToString()};
+  modify_command
+      .add_option("datetime", datetime_str, "Datetime of weight measurement")
+      ->transform(transform_datetime);
+
+  CLI11_PARSE(cli_global, argc, argv) std::unique_ptr<WeightermData> data;
   try {
     data = std::make_unique<WeightermDataSqlite>();
   } catch (const DataException &e) {
@@ -98,7 +119,8 @@ int HandleCli(int argc, char **argv) {
   } else if (delete_command) {
     DeleteWeightMeasurement(data.get(), id);
   } else if (modify_command) {
-    ModifyWeightMeasurement(data.get(), id, weight);
+    spdlog::info("Datetime string: " + datetime_str);
+    ModifyWeightMeasurement(data.get(), id, weight, Datetime{datetime_str});
   } else {
     spdlog::info("Run with --help or -h to see available subcommands.");
   }
