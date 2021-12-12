@@ -43,8 +43,17 @@ bool DeleteWeightMeasurement(WeightermData *weighterm_data, int id) {
 }
 
 bool ModifyWeightMeasurement(WeightermData *weighterm_data, int id,
-                             double weight, Datetime datetime) {
+                             double weight, const std::string &datetime_str) {
   spdlog::info("Updating weight measure with ID: " + std::to_string(id));
+  Datetime datetime{datetime_str};
+  if (datetime_str.empty()) {
+    auto weight_in_db = weighterm_data->FindWeight(id);
+    if (weight_in_db.data_result == DataResult::NOT_FOUND) {
+      spdlog::error("There is no weight measurement with that ID");
+      return false;
+    }
+    datetime = weight_in_db.weight_measure.GetDatetime();
+  }
   switch (weighterm_data->ModifyWeight(id, weight, datetime)) {
     case DataResult::OK:
       spdlog::info("Weight measurement updated");
@@ -84,7 +93,7 @@ int HandleCli(int argc, char **argv) {
       ->required()
       ->check(CLI::PositiveNumber);
 
-  auto transform_datetime = CLI::Validator(
+  auto transform_datetime_modify = CLI::Validator(
       [](std::string &input) {
         auto datetime_time_point{std::chrono::system_clock::now()};
         if (input == "yesterday") {
@@ -101,10 +110,10 @@ int HandleCli(int argc, char **argv) {
       },
       "DATETIME", "Datetime transformer");
 
-  std::string datetime_str{Datetime{}.ToString()};
+  std::string datetime_str{};
   modify_command
       .add_option("datetime", datetime_str, "Datetime of weight measurement")
-      ->transform(transform_datetime);
+      ->transform(transform_datetime_modify);
 
   CLI11_PARSE(cli_global, argc, argv) std::unique_ptr<WeightermData> data;
   try {
@@ -119,8 +128,7 @@ int HandleCli(int argc, char **argv) {
   } else if (delete_command) {
     DeleteWeightMeasurement(data.get(), id);
   } else if (modify_command) {
-    spdlog::info("Datetime string: " + datetime_str);
-    ModifyWeightMeasurement(data.get(), id, weight, Datetime{datetime_str});
+    ModifyWeightMeasurement(data.get(), id, weight, datetime_str);
   } else {
     spdlog::info("Run with --help or -h to see available subcommands.");
   }

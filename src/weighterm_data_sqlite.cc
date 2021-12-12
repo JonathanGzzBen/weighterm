@@ -57,6 +57,37 @@ WeightermDataSqlite::~WeightermDataSqlite() {
   spdlog::info("Database connection closed");
 }
 
+FindWeightResult WeightermDataSqlite::FindWeight(int id) {
+  std::unordered_map<std::string, std::string> data;
+  char* error_message = nullptr;
+  if (auto rc = sqlite3_exec(
+          db_, R"(
+      SELECT ID, Kg, Datetime FROM weight;
+);
+    )",
+          [](void* data_ptr, int argc, char** argv, char** az_col_name) {
+            std::unordered_map<std::string, std::string> values{};
+            for (int i{0}; i < argc; i++) {
+              values[az_col_name[i]] = argv[i];
+            }
+            auto result_ptr =
+                static_cast<std::unordered_map<std::string, std::string>*>(
+                    data_ptr);
+            *result_ptr = values;
+            return 0;
+          },
+          &data, &error_message);
+      rc != SQLITE_OK) {
+    sqlite3_free(error_message);
+  }
+  if (data.empty()) {
+    return FindWeightResult{DataResult::NOT_FOUND};
+  }
+  WeightMeasure weight{std::stoi(data.at("ID")), std::stod(data.at("Kg")),
+                       Datetime{data.at("Datetime")}};
+  return FindWeightResult{DataResult::OK, weight};
+}
+
 DataResult WeightermDataSqlite::RegisterWeight(double weight) {
   char* error_message = nullptr;
   auto time_t_now =

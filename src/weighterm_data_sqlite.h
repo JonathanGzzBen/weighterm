@@ -15,6 +15,7 @@ class WeightermDataSqlite : public WeightermData {
  public:
   WeightermDataSqlite();
   ~WeightermDataSqlite() override;
+  FindWeightResult FindWeight(int data_ptr) override;
   DataResult RegisterWeight(double weight) override;
   [[nodiscard]] std::vector<WeightMeasure> ListWeights() const override;
   DataResult DeleteWeight(int id) override;

@@ -11,10 +11,16 @@ enum class DataResult {
   OK
 };
 
+struct FindWeightResult {
+  DataResult data_result = DataResult::COULD_NOT_OPEN_DATABASE;
+  WeightMeasure weight_measure = WeightMeasure{0, 0, Datetime{}};
+};
+
 class WeightermData {
  public:
   WeightermData() = default;
   virtual ~WeightermData() = default;
+  virtual FindWeightResult FindWeight(int id) = 0;
   virtual DataResult RegisterWeight(double weight) = 0;
   [[nodiscard]] virtual std::vector<WeightMeasure> ListWeights() const = 0;
   virtual DataResult DeleteWeight(int id) = 0;
