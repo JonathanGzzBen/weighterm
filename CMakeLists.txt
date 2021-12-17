@@ -11,11 +11,11 @@ conan_basic_setup(TARGETS)
 include_directories(${CMAKE_SOURCE_DIR} ./src)
 
 set(SOURCES
-        src/weighterm_data_sqlite.cpp
-        src/weight_measure.cpp
-        src/weighterm.cpp
-        src/weighterm_cli.cpp
-        src/datetime.cpp)
+        src/weighterm_data_sqlite.cc
+        src/weight_measure.cc
+        src/weighterm.cc
+        src/weighterm_cli.cc
+        src/datetime.cc)
 
 set(HEADERS
         src/data_exception.h
@@ -25,8 +25,6 @@ set(HEADERS
         src/weighterm_cli.h
         src/datetime.h)
 
-enable_testing()
-add_subdirectory(./libs/googletest)
 
 add_executable(${This} ${SOURCES})
 add_library(${This}_lib STATIC ${SOURCES} ${HEADERS})
@@ -34,4 +32,5 @@ add_library(${This}_lib STATIC ${SOURCES} ${HEADERS})
 conan_target_link_libraries(${This})
 conan_target_link_libraries(${This}_lib)
 
+enable_testing()
 add_subdirectory(test)
