@@ -10,7 +10,7 @@
 bool RegisterWeight(WeightermData *data, const double &weight,
                     const std::string &datetime_str) {
   if (Datetime datetime{datetime_str};
-      data->RegisterWeight(weight, datetime) != DataResult::OK) {
+      data->RegisterWeight(weight, datetime) != DataResultCode::OK) {
     spdlog::error("Could not register weight");
     return false;
   }
@@ -18,7 +18,11 @@ bool RegisterWeight(WeightermData *data, const double &weight,
 }
 
 bool ListWeights(const WeightermData *const weighterm_data) {
-  for (const auto &weight : weighterm_data->ListWeights()) {
+  auto res{weighterm_data->ListWeights()};
+  if (res.code != DataResultCode::OK) {
+    spdlog::error("Could not fetch weight measurements");
+  }
+  for (const auto &weight : res.value) {
     spdlog::info("{}", weight);
   }
   return true;
@@ -26,7 +30,7 @@ bool ListWeights(const WeightermData *const weighterm_data) {
 
 bool DeleteWeightMeasurement(WeightermData *weighterm_data, int id) {
   spdlog::info("Deleting weight measure with ID: " + std::to_string(id));
-  if (weighterm_data->DeleteWeight(id) != DataResult::OK) {
+  if (weighterm_data->DeleteWeight(id) != DataResultCode::OK) {
     spdlog::error("Could not delete weight measurement");
     return false;
   }
@@ -39,17 +43,17 @@ bool ModifyWeightMeasurement(WeightermData *weighterm_data, int id,
   Datetime datetime{datetime_str};
   if (datetime_str.empty()) {
     auto weight_in_db = weighterm_data->FindWeight(id);
-    if (weight_in_db.data_result == DataResult::NOT_FOUND) {
+    if (weight_in_db.code == DataResultCode::NOT_FOUND) {
       spdlog::error("There is no weight measurement with that ID");
       return false;
     }
-    datetime = weight_in_db.weight_measure.GetDatetime();
+    datetime = weight_in_db.value.GetDatetime();
   }
   switch (weighterm_data->ModifyWeight(id, weight, datetime)) {
-    case DataResult::OK:
+    case DataResultCode::OK:
       spdlog::info("Weight measurement updated");
       return true;
-    case DataResult::NOT_FOUND:
+    case DataResultCode::NOT_FOUND:
       spdlog::error("There is no weight measurement with that ID");
       break;
     default:

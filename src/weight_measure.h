@@ -8,6 +8,7 @@
 
 class WeightMeasure {
  public:
+  WeightMeasure();
   WeightMeasure(int id, double weight, Datetime datetime);
   [[nodiscard]] int GetId() const;
   [[nodiscard]] double GetWeight() const;

@@ -10,13 +10,13 @@
 #include "spdlog/spdlog.h"
 #include "src/data_exception.h"
 
-DataResult WeightermDataSqlite::InitializeDatabase() {
+DataResultCode WeightermDataSqlite::InitializeDatabase() {
   auto result_code = sqlite3_open("weighterm.db", &db_);
   if (result_code != SQLITE_OK) {
     std::stringstream error_message;
     error_message << "Error opening DB: " << sqlite3_errmsg(db_);
     spdlog::error(error_message.str());
-    return DataResult::COULD_NOT_OPEN_DATABASE;
+    return DataResultCode::COULD_NOT_OPEN_DATABASE;
   } else {
     spdlog::info("Opened database successfully");
 
@@ -36,17 +36,17 @@ CREATE TABLE weight(
       if (str_error_message != "table weight already exists") {
         spdlog::error(error_message);
         sqlite3_free(error_message);
-        return DataResult::COULD_NOT_OPEN_DATABASE;
+        return DataResultCode::COULD_NOT_OPEN_DATABASE;
       }
     }
 
-    return DataResult::OK;
+    return DataResultCode::OK;
   }
 }
 
 WeightermDataSqlite::WeightermDataSqlite() : WeightermData() {
   auto result = InitializeDatabase();
-  if (result != DataResult::OK) {
+  if (result != DataResultCode::OK) {
     throw DataException{"Could not initialize database"};
   }
 }
@@ -56,14 +56,14 @@ WeightermDataSqlite::~WeightermDataSqlite() {
   spdlog::info("Database connection closed");
 }
 
-FindWeightResult WeightermDataSqlite::FindWeight(int id) {
+DataResult<WeightMeasure> WeightermDataSqlite::FindWeight(int id) {
   std::unordered_map<std::string, std::string> data;
   char* error_message = nullptr;
+  std::string find_sql =
+      "SELECT ID, Kg, Datetime FROM weight WHERE ID = " + std::to_string(id) +
+      ";";
   if (auto rc = sqlite3_exec(
-          db_, R"(
-      SELECT ID, Kg, Datetime FROM weight;
-);
-    )",
+          db_, find_sql.c_str(),
           [](void* data_ptr, int argc, char** argv, char** az_col_name) {
             std::unordered_map<std::string, std::string> values{};
             for (int i{0}; i < argc; i++) {
@@ -80,15 +80,16 @@ FindWeightResult WeightermDataSqlite::FindWeight(int id) {
     sqlite3_free(error_message);
   }
   if (data.empty()) {
-    return FindWeightResult{DataResult::NOT_FOUND};
+    return DataResult<WeightMeasure>{DataResultCode::NOT_FOUND,
+                                     WeightMeasure{}};
   }
   WeightMeasure weight{std::stoi(data.at("ID")), std::stod(data.at("Kg")),
                        Datetime{data.at("Datetime")}};
-  return FindWeightResult{DataResult::OK, weight};
+  return DataResult<WeightMeasure>{DataResultCode::OK, weight};
 }
 
-DataResult WeightermDataSqlite::RegisterWeight(double weight,
-                                               Datetime datetime) {
+DataResultCode WeightermDataSqlite::RegisterWeight(double weight,
+                                                   Datetime datetime) {
   char* error_message = nullptr;
   std::stringstream insert_statement_sql{};
   insert_statement_sql << "INSERT INTO weight(Kg, Datetime) VALUES (" << weight
@@ -99,18 +100,18 @@ DataResult WeightermDataSqlite::RegisterWeight(double weight,
       rc != SQLITE_OK) {
     std::string str_error_message{error_message};
     sqlite3_free(error_message);
-    return DataResult::COULD_NOT_OPEN_DATABASE;
+    return DataResultCode::COULD_NOT_OPEN_DATABASE;
   }
-  return DataResult::OK;
+  return DataResultCode::OK;
 }
 
-std::vector<WeightMeasure> WeightermDataSqlite::ListWeights() const {
+DataResult<std::vector<WeightMeasure>> WeightermDataSqlite::ListWeights()
+    const {
   std::vector<WeightMeasure> results{};
   char* error_message = nullptr;
   if (auto rc = sqlite3_exec(
           db_, R"(
       SELECT ID, Kg, Datetime FROM weight;
-);
     )",
           [](void* weight_measures_vector_ptr, int argc, char** argv,
              char** az_col_name) {
@@ -128,10 +129,13 @@ std::vector<WeightMeasure> WeightermDataSqlite::ListWeights() const {
           &results, &error_message);
       rc != SQLITE_OK) {
     sqlite3_free(error_message);
+    return DataResult<std::vector<WeightMeasure>>{
+        DataResultCode::COULD_NOT_RUN_QUERY};
   }
-  return results;
+  return DataResult<std::vector<WeightMeasure>>{DataResultCode::OK, results};
 }
-DataResult WeightermDataSqlite::DeleteWeight(int id) {
+
+DataResultCode WeightermDataSqlite::DeleteWeight(int id) {
   char* error_message = nullptr;
   std::stringstream count_statement_sql{};
   count_statement_sql << "SELECT COUNT(*) FROM weight WHERE ID=" << id << ";";
@@ -148,7 +152,7 @@ DataResult WeightermDataSqlite::DeleteWeight(int id) {
 
   if (rc != SQLITE_OK || rows_found <= 0) {
     sqlite3_free(error_message);
-    return DataResult::NOT_FOUND;
+    return DataResultCode::NOT_FOUND;
   }
 
   std::stringstream insert_statement_sql{};
@@ -160,13 +164,13 @@ DataResult WeightermDataSqlite::DeleteWeight(int id) {
       &error_message);
   if (rc != SQLITE_OK) {
     sqlite3_free(error_message);
-    return DataResult::COULD_NOT_RUN_QUERY;
+    return DataResultCode::COULD_NOT_RUN_QUERY;
   }
-  return DataResult::OK;
+  return DataResultCode::OK;
 }
 
-DataResult WeightermDataSqlite::ModifyWeight(int id, double weight,
-                                             Datetime datetime) {
+DataResultCode WeightermDataSqlite::ModifyWeight(int id, double weight,
+                                                 Datetime datetime) {
   char* error_message = nullptr;
   std::string count_statement_sql{
       "SELECT COUNT(*) FROM weight WHERE ID=" + std::to_string(id) + ";"};
@@ -183,7 +187,7 @@ DataResult WeightermDataSqlite::ModifyWeight(int id, double weight,
 
   if (rc != SQLITE_OK || rows_found <= 0) {
     sqlite3_free(error_message);
-    return DataResult::NOT_FOUND;
+    return DataResultCode::NOT_FOUND;
   }
 
   std::string update_statement_sql{
@@ -194,7 +198,7 @@ DataResult WeightermDataSqlite::ModifyWeight(int id, double weight,
                     &error_message);
   if (rc != SQLITE_OK) {
     sqlite3_free(error_message);
-    return DataResult::COULD_NOT_RUN_QUERY;
+    return DataResultCode::COULD_NOT_RUN_QUERY;
   }
-  return DataResult::OK;
+  return DataResultCode::OK;
 }

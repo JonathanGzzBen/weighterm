@@ -12,10 +12,11 @@
 
 class MockWeightermData : public WeightermData {
  public:
-  MOCK_METHOD(DataResult, RegisterWeight, (double weight), (override));
+  MOCK_METHOD(DataResultCode, RegisterWeight, (double weight), (override));
   MOCK_METHOD(std::vector<WeightMeasure>, ListWeights, (), (const, override));
-  MOCK_METHOD(DataResult, DeleteWeight, (int id), (override));
-  MOCK_METHOD(DataResult, ModifyWeight, (int id, double weight), (override));
+  MOCK_METHOD(DataResultCode, DeleteWeight, (int id), (override));
+  MOCK_METHOD(DataResultCode, ModifyWeight, (int id, double weight),
+              (override));
 };
 
 #endif  // WEIGHTERM_TEST_MOCK_WEIGHTERM_DATA_H_

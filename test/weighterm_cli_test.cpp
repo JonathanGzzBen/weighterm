@@ -23,7 +23,7 @@ TEST(HandleRegister, NumericStringArgumentReturnFalse) {
   auto data = std::make_unique<MockWeightermData>();
   EXPECT_CALL(*data, RegisterWeight(_))
       .Times(Exactly(1))
-      .WillOnce(Return(DataResult::OK));
+      .WillOnce(Return(DataResultCode::OK));
   auto result{RegisterWeight(data.get(), "12.4")};
   EXPECT_TRUE(result);
 }
