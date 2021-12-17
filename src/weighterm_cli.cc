@@ -2,24 +2,15 @@
 
 #include <CLI/CLI.hpp>
 #include <iomanip>
-#include <iostream>
 
 #include "data_exception.h"
 #include "spdlog/spdlog.h"
 #include "weighterm_data_sqlite.h"
 
-bool RegisterWeight(WeightermData *data, const std::string &weight_string) {
-  double weight;
-  try {
-    weight = std::stod(weight_string);
-  } catch (const std::invalid_argument &) {
-    spdlog::error("Weight must be a numeric value");
-    return false;
-  } catch (const std::out_of_range &) {
-    spdlog::error("Weight out of range");
-    return false;
-  }
-  if (data->RegisterWeight(weight) != DataResult::OK) {
+bool RegisterWeight(WeightermData *data, const double &weight,
+                    const std::string &datetime_str) {
+  if (Datetime datetime{datetime_str};
+      data->RegisterWeight(weight, datetime) != DataResult::OK) {
     spdlog::error("Could not register weight");
     return false;
   }
@@ -75,6 +66,34 @@ int HandleCli(int argc, char **argv) {
   register_command.add_option("weight", weight, "Weight to register")
       ->required()
       ->check(CLI::PositiveNumber);
+
+  auto transform_datetime_modify = CLI::Validator(
+      [](std::string &input) {
+        try {
+          input = Datetime{input}.ToString();
+          return std::string();
+        } catch (const std::invalid_argument &) {
+          auto datetime_time_point{std::chrono::system_clock::now()};
+          if (input == "yesterday") {
+            datetime_time_point -= std::chrono::days(1);
+          } else if (input != "now") {
+            return std::string{
+                "Specify a valid datetime (\"now\", \"yesterday\", "
+                "\"2021-12-31 "
+                "12:00:00\")"};
+          }
+          input = Datetime{std::chrono::system_clock::to_time_t(
+                               datetime_time_point)}
+                      .ToString();
+          return std::string();
+        }
+      },
+      "DATETIME", "Datetime transformer");
+  std::string datetime_str{};
+  register_command
+      .add_option("datetime", datetime_str, "Datetime of weight measurement")
+      ->transform(transform_datetime_modify);
+
   auto const &list_command =
       *cli_global.add_subcommand("list", "List registered weight measurements");
 
@@ -93,24 +112,6 @@ int HandleCli(int argc, char **argv) {
       ->required()
       ->check(CLI::PositiveNumber);
 
-  auto transform_datetime_modify = CLI::Validator(
-      [](std::string &input) {
-        auto datetime_time_point{std::chrono::system_clock::now()};
-        if (input == "yesterday") {
-          datetime_time_point -= std::chrono::days(1);
-        } else if (input != "now") {
-          return std::string{
-              "Specify a valid datetime (\"now\", \"yesterday\", \"2021-12-31 "
-              "12:00:00\")"};
-        }
-        input =
-            Datetime{std::chrono::system_clock::to_time_t(datetime_time_point)}
-                .ToString();
-        return std::string();
-      },
-      "DATETIME", "Datetime transformer");
-
-  std::string datetime_str{};
   modify_command
       .add_option("datetime", datetime_str, "Datetime of weight measurement")
       ->transform(transform_datetime_modify);
@@ -122,7 +123,7 @@ int HandleCli(int argc, char **argv) {
     spdlog::error(e.what());
   }
   if (register_command) {
-    RegisterWeight(data.get(), std::to_string(weight));
+    RegisterWeight(data.get(), weight, datetime_str);
   } else if (list_command) {
     ListWeights(data.get());
   } else if (delete_command) {

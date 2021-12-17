@@ -2,7 +2,6 @@
 
 #include <sqlite3.h>
 
-#include <chrono>
 #include <iomanip>
 #include <map>
 #include <string>
@@ -88,11 +87,9 @@ FindWeightResult WeightermDataSqlite::FindWeight(int id) {
   return FindWeightResult{DataResult::OK, weight};
 }
 
-DataResult WeightermDataSqlite::RegisterWeight(double weight) {
+DataResult WeightermDataSqlite::RegisterWeight(double weight,
+                                               Datetime datetime) {
   char* error_message = nullptr;
-  auto time_t_now =
-      std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-  Datetime datetime{time_t_now};
   std::stringstream insert_statement_sql{};
   insert_statement_sql << "INSERT INTO weight(Kg, Datetime) VALUES (" << weight
                        << ",\"" << datetime.ToString() << "\");";
