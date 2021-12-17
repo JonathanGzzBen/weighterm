@@ -64,7 +64,7 @@ bool ModifyWeightMeasurement(WeightermData *weighterm_data, int id,
 }
 
 int HandleCli(int argc, char **argv) {
-  CLI::App cli_global{"weighterm 0.2"};
+  CLI::App cli_global{"weighterm 0.3.0"};
   auto &register_command = *cli_global.add_subcommand(
       "register", "Register a new weight measurement");
   double weight;
