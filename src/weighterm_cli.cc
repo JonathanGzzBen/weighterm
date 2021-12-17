@@ -23,23 +23,23 @@ bool ListWeights(const WeightermData *const weighterm_data) {
     spdlog::error("Could not fetch weight measurements");
   }
   for (const auto &weight : res.value) {
-    spdlog::info("{}", weight);
+    std::cout << weight << std::endl;
   }
   return true;
 }
 
 bool DeleteWeightMeasurement(WeightermData *weighterm_data, int id) {
-  spdlog::info("Deleting weight measure with ID: " + std::to_string(id));
   if (weighterm_data->DeleteWeight(id) != DataResultCode::OK) {
     spdlog::error("Could not delete weight measurement");
     return false;
   }
+  std::cout << "Deleted weight measurement with ID: " << std::to_string(id)
+            << std::endl;
   return true;
 }
 
 bool ModifyWeightMeasurement(WeightermData *weighterm_data, int id,
                              double weight, const std::string &datetime_str) {
-  spdlog::info("Updating weight measure with ID: " + std::to_string(id));
   Datetime datetime{datetime_str};
   if (datetime_str.empty()) {
     auto weight_in_db = weighterm_data->FindWeight(id);
@@ -51,7 +51,8 @@ bool ModifyWeightMeasurement(WeightermData *weighterm_data, int id,
   }
   switch (weighterm_data->ModifyWeight(id, weight, datetime)) {
     case DataResultCode::OK:
-      spdlog::info("Weight measurement updated");
+      std::cout << "Modified weight measurement with ID: " << std::to_string(id)
+                << std::endl;
       return true;
     case DataResultCode::NOT_FOUND:
       spdlog::error("There is no weight measurement with that ID");
@@ -135,7 +136,8 @@ int HandleCli(int argc, char **argv) {
   } else if (modify_command) {
     ModifyWeightMeasurement(data.get(), id, weight, datetime_str);
   } else {
-    spdlog::info("Run with --help or -h to see available subcommands.");
+    std::cout << "Run with --help or -h to see available subcommands."
+              << std::endl;
   }
   return 0;
 }

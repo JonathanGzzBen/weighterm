@@ -18,8 +18,6 @@ DataResultCode WeightermDataSqlite::InitializeDatabase() {
     spdlog::error(error_message.str());
     return DataResultCode::COULD_NOT_OPEN_DATABASE;
   } else {
-    spdlog::info("Opened database successfully");
-
     char* error_message = nullptr;
 
     sqlite3_exec(db_, R"(
@@ -53,7 +51,6 @@ WeightermDataSqlite::WeightermDataSqlite() : WeightermData() {
 
 WeightermDataSqlite::~WeightermDataSqlite() {
   sqlite3_close(db_);
-  spdlog::info("Database connection closed");
 }
 
 DataResult<WeightMeasure> WeightermDataSqlite::FindWeight(int id) {
