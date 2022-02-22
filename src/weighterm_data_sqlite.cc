@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <map>
 #include <string>
+#include <sstream>
 #include <vector>
 
 #include "spdlog/spdlog.h"
